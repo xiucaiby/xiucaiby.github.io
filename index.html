@@ -87,7 +87,18 @@ var _hmt = _hmt || [];
         </div> 
         <div class="scaleBox image-light"> 
          <h1 class="title isScale">Welcome to Nanib</h1> 
-        </div> 
+            <main class="mdl-layout__content">
+      <div class="page-content">
+        <!--hitokoto一言-->
+        <div id="hitokoto" class="">
+          <div class="bracket left">『</div>
+          <div class="word" id="hitokoto_text"></div>
+          <div class="bracket right">』</div>
+          <div class="author" id="hitokoto_author"></div>
+        </div>
+      </div>
+            </main>
+        </div> <!--
          <div id="typed-strings"> 
          <p>越过山坡终有灯火，沿途高歌终有应和。</p> 
          <p>生活不止眼前苟且，还有诗和远方田野。</p> 
@@ -96,7 +107,7 @@ var _hmt = _hmt || [];
          <p>我们该记住沿途的风景并一路向前。</p> 
          <p>祝你前程似锦，我们未来可期。</p> 
          <p>人生没有彩排，每天都是现场直播。</p> 
-        </div> 
+        </div> -->
         <div class="scaleBox"> 
          <div class="type-wrap isScale"> 
           <p class="image-light"><span id="typed"></span></p> 
@@ -135,5 +146,52 @@ var _hmt = _hmt || [];
   <script type="text/javascript" src="https://i0047ol.gitee.io/assets/js/index.min.js"></script> 
   <script type="text/javascript" src="https://unpkg.com/typed.js@2.0.12/lib/typed.min.js"></script> 
   <script type="text/javascript" src="https://unpkg.com/mdui@1.0.2/dist/js/mdui.min.js"></script>  
+<script>
+    var like_num = parseInt("45");
+    var sentenceUUID = "cffac50e-7a43-45c7-9aaf-6b18e78efd07";
+   function loveHitokoto() {
+      fetch("https://v1.hitokoto.cn?encode=json")
+        .then(function (response) {
+          return response.json();
+        })
+        .then(function (data) {
+          fetch("https://hitokoto.cn/api/common/v1/like?sentence_uuid=" + data.uuid)
+            .then(function (response) {
+              return response.json();
+            })
+            .then(function (result) {
+              // Update Like
+              sentenceUUID = data.uuid;
+              like_num = result.data[0].total;
+              $("#like_number1").attr("data-badge", result.data[0].total);
+              $("#like_number2").attr("data-badge", result.data[0].total);
+
+             // if ($('#hitokoto').hasClass("animated")) {
+                //$('#hitokoto').removeClass("animated");
+                //$('#hitokoto').removeClass("fadeIn");
+//              }
+              //$('#hitokoto').animateCss('bounce');
+              $('#hitokoto_text').text(data.hitokoto);
+              var author = !!data.from ? data.from : "无名氏";
+              $('#hitokoto_author').text("—— " + (data.from_who || '') + "「" + author + "」");
+              window.setTimeout(loveHitokoto, 10000);
+            })
+            .catch(function (err) {
+              console.error(`在更新一言时捕获错误， 错误信息: ${err.message}. 当前时间: ${new Date().toISOString()}`);
+              loveHitokoto();
+            });
+        })
+        .catch(function (err) {
+          console.error(`在更新一言时捕获错误， 错误信息: ${err.message}. 当前时间: ${new Date().toISOString()}`);
+          loveHitokoto();
+        });
+    }
+    var isID = 0;
+    if (!isID) {
+      window.setTimeout(loveHitokoto, 10000);
+    }
+
+</script>
+
  </body>
 </html>
